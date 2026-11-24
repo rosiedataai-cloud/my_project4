@@ -17,7 +17,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # 3. 라우팅 구성/정의 -> 메소드 결정 (get방식 적용=>대시보드 홈페이지)
 #    "/" => URL 정의 => 여기서는 홈페이지 의미함
 @app.get("/") # 홈페이지가 요청되면 누가(함수) 처리할것인가?
-def home(req:Request): # 요청객체가 함수 인자로 전달됨
+def home(req:Request): # 요청객체가 함수 인자로 전달됨 
     # 비즈니스 로직 => 생략
     # 응답 -> 결론은 문자열 (json 형식, html 형식, xml 형식, ...)
     # 클라이언트 요청 (주소 : http://localhost/ ) -> .. -> 서버 도착 -> 
