@@ -41,7 +41,7 @@ jobs:
               with:
                 # 시크릿 변수를 가져와서 설정 내용
                 host: ${{ secrets.HOST }}
-                username: ${{ secrets.USERNAME }}
+                username: ${{ secrets.USER_NAME }}
                 key: ${{ secrets.EC2_KEY }}
                 port: 22
                 # 편의상 현재 디렉토리의 모든 내용 카피
