@@ -74,7 +74,7 @@ jobs:
               username: ${{ secrets.USER_NAME }}
               key: ${{ secrets.EC2_KEY }}
               port: 22
-              script:
+              script: |
                 # 작업 디렉토리 이동 (yml 파일 위치
                 cd /home/ubuntu
                 docker-compose up -d
