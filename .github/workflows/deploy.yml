@@ -49,3 +49,21 @@ jobs:
                 # aws ec2 서버의 특정위치에 카피
                 # /home/ubuntu/projects/*.* 세팅
                 target: "/home/ubuntu/projects"
+
+                # 서비스 재가동 명령 전달
+            - name: restart service
+              uses: appleboy/ssh-action@master
+              with:
+                # EC2 접속 정보
+                host: ${{ secrets.HOST }}
+                username: ${{ secrets.USER_NAME }}
+                key: ${{ secrets.EC2_KEY }}
+                port: 22
+                # 스크립트 -> 접속 후 처리해야할 명령어 n개 나열
+                script: |
+                  # 코드가 엄청 증가, 새로운 패키기 사용하여 업데이트 => 패키지 설치 필요
+                  # 가상환경 활성화 => 패키지 설치 추가 되어야 함
+                  # cd /home/ubuntu/projects
+                  # .web/bin/pip install -r requirements.txt
+                  # restart :  
+                  sudo systemctl restart hello.service\
