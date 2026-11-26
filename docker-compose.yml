@@ -83,7 +83,7 @@ services:
       - "80:80"
       # volumes: # docker-compose.yaml 파일 기준으로 경로 설정 + 파일 위치를 확실하게 알아야 함.
       # web.conf 파일을 컨테이너 안에 default.conf에 반영되는 구조로 설정 + 프록시 규칙이나 가상 호스트 등등의 내용을 명시
-      - ./proxy/web.conf:/etc/nginx/conf.d/default.conf
+      # - ./proxy/web.conf:/etc/nginx/conf.d/default.conf
     networks:
       - my-net
 
