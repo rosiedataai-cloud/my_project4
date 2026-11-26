@@ -38,10 +38,11 @@ services:
 
   app:
     # 아래 코드는 로컬 환경(개발 환경)에서 유용함
-    # ec2에서 컴포즈가 가동할 때는 imag: <dockerhub계정>/fastapi-app:1.0 변경
+    # ec2에서 컴포즈가 가동할 때는 image: <dockerhub계정>/fastapi-app:1.0 변경
     # 이미지는 ci서버에서 생성함
     # app이라는 디렉토리 내부에 존재하는 Dockerfile을 기반으로 이미지 빌드 -> 컨테이너 생성
-    build: ./app
+    # build: ./app
+    image: rosie030503/fastapi-app:1.0
     container_name: fastapi_app
     restart: unless-stopped
     ports:
@@ -51,8 +52,8 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000
     # 최종 배포판에서는 필요없음 -> 수정 내용 있으면 이미지 업데이트, 컨테이너 교체
     # 볼륨은 docker-compose.yaml 기준으로 판단해야함 + 바인드 마운트 방식
-    volumes:
-      - ./app:/app # 경로 설정 -> [호스트 OS]:[컨테이너 경로]
+    # volumes:
+    #  - ./app:/app # 경로 설정 -> [호스트 OS]:[컨테이너 경로]
     
     environment:
       # - name=value <- 이 방법도 가능
@@ -75,8 +76,8 @@ services:
   # web 서버 구성 (80포트) + was로 보내는 구성으로
   proxy:
     # 추후 이미지는 ci에서 처리, ec2 컴포즈에서는 image: <dockerhub계정>/nginx-proxy:1.0 변경
-    # image: nginx:alpine
-    build: ./nginx
+    image: rosie030503/nginx-proxy:1.0
+    # build: ./nginx
     container_name: nginx_proxy
     restart: unless-stopped
     ports:
