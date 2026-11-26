@@ -66,4 +66,4 @@ jobs:
                   # cd /home/ubuntu/projects
                   # .web/bin/pip install -r requirements.txt
                   # restart :  
-                  sudo systemctl restart hello.service\
+                  sudo systemctl restart hello.service
