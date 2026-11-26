@@ -9,9 +9,7 @@ services:
 
     # 컨테이너 중단 시, 자동으로 재구동 True
     restart: always
-
-     
-
+ 
     # 도커 엔진상의 특정 경로(볼륨 마운트)와 컨테이너 내부 mysql 데이터 저장 위치 공유 (동기화 설정)
     volumes:
       - mysql-vol:/var/lib/mysql
