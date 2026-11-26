@@ -1,0 +1,97 @@
+# 각각의 컨테이너를 구성
+services:
+  db: # <- 서비스 이름 (접속, URL 등등 코드 내부에서 사용)
+    # 도커 허브에서 오피셜 이미지를 받음
+    image: mysql
+
+    # CLI 등에서 명령어 사용 시
+    container_name: mysql-db
+
+    # 컨테이너 중단 시, 자동으로 재구동 True
+    restart: always
+
+    # .env 직접 반영하기
+    env_file:
+      - .env
+
+    # 도커 엔진상의 특정 경로(볼륨 마운트)와 컨테이너 내부 mysql 데이터 저장 위치 공유 (동기화 설정)
+    volumes:
+      - mysql-vol:/var/lib/mysql
+
+    ports:
+      - "3306:3306"
+
+    # 서비스 이름으로 해당 서비스를 호출 가능함 (같은 네트워크 시)
+    networks:
+      - my-net
+
+    # 환경변수 설정
+    environment:
+      # root
+      MYSQL_ROOT_PASSWORD : 1234
+
+      # 컨테이너 생성 시, DB 즉시 생성
+      MYSQL_DATABASE : memo
+
+      # 사용자 추가
+      MYSQL_USER : guest
+      MYSQL_PASSWORD : 1234
+    
+
+  app:
+    # app이라는 디렉토리 내부에 존재하는 Dockerfile을 기반으로 이미지 빌드 -> 컨테이너 생성
+    build: ./app
+    container_name: fastapi_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    # Dockerfile의 CMD or ENTRYPOINT + CMD -> 데문 띄우는 부분 + 실행의 관점은 ./app/Dockerfile 위치임.
+    # 모듈 이름은 import한 객체 이름을 써야함 ex) FaseAPI
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+
+    # 볼륨은 docker-compose.yaml 기준으로 판단해야함 + 바인드 마운트 방식
+    volumes:
+      - ./app:/app # 경로 설정 -> [호스트 OS]:[컨테이너 경로]
+    
+    environment:
+      # - name=value <- 이 방법도 가능
+      # "[프로토콜 이름]://[아이디]:[비번]@ip[서비스 이름]:[port]/[데이터베이스 이름]"
+      # python dotenv 라이브러리롷 대체 가능함
+      DATABASE_URL: "mysql+pymysql://root:1234@db:3306/memo"
+
+      # .env 수동 읽어오기 설정
+      AI_GPT_KEY: ${AI_GPT_KEY}
+
+    # 동일 네트워크에 존재해야 서비스 이름을 사용 가능 or IP 호출 등 필요
+    networks:
+      - my-net
+
+    # dependency -> 생성 순서 제어 가능
+    depends_on:
+      - db # DB 생성 후 컨테이너 생성하도록
+
+
+  # web 서버 구성 (80포트) + was로 보내는 구성으로
+  proxy:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes: # docker-compose.yaml 파일 기준으로 경로 설정 + 파일 위치를 확실하게 알아야 함.
+      # web.conf 파일을 컨테이너 안에 default.conf에 반영되는 구조로 설정 + 프록시 규칙이나 가상 호스트 등등의 내용을 명시
+      - ./proxy/web.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - my-net
+
+    depends_on: # 구동 순서 중요한가..? proxy -> app -> db
+      - app
+
+# 컨테이너간 연결 구성
+networks:
+  my-net:
+    driver: bridge
+
+# 데이터 백업 및 보관 + 공유 설정
+volumes:
+  mysql-vol:
